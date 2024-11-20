@@ -22,8 +22,8 @@ public:
   std::vector<TriggerInfo> triggers_info;
   std::vector<WCTEMPMTHit> mpmt_hits;  
   std::vector<WCTEMPMTWaveform> mpmt_waveforms;
-  std::vector<HKMPMTHit> hk_mpmt_hits;
-  std::vector<HKMPMTPPS> hk_mpmt_pps;
+  std::vector<HKMPMTHit> hkmpmt_hits;
+  std::vector<HKMPMTPPS> hkmpmt_pps;
   std::vector<TDCHit> tdc_hits;
   std::vector<QDCHit> qdc_hits;
   unsigned long start_counter;
@@ -38,9 +38,9 @@ public:
     std::cout<<"/////////////////////////mpmt waveforms//////////////////"<<std::endl;
     for(int i=0; i<mpmt_waveforms.size(); i++){std::cout<<"///["<<i<<"]///"<<std::endl; mpmt_waveforms.at(i).Print();}
     std::cout<<"/////////////////////////hk mpmt hits//////////////////"<<std::endl;
-    for(int i=0; i<hk_mpmt_hits.size(); i++){ std::cout<<"///["<<i<<"]///"<<std::endl; hk_mpmt_hits.at(i).Print();}
+    for(int i=0; i<hkmpmt_hits.size(); i++){ std::cout<<"///["<<i<<"]///"<<std::endl; hkmpmt_hits.at(i).Print(); hkmpmt_hits.at(i).Dump();}
     std::cout<<"/////////////////////////hk mpmt pps//////////////////"<<std::endl;
-    for(int i=0; i<hk_mpmt_pps.size(); i++){ std::cout<<"///["<<i<<"]///"<<std::endl; hk_mpmt_pps.at(i).Print();}
+    for(int i=0; i<hkmpmt_pps.size(); i++){ std::cout<<"///["<<i<<"]///"<<std::endl; hkmpmt_pps.at(i).Print();}
     std::cout<<"/////////////////////////tdc data//////////////////"<<std::endl;
     for(int i=0; i<tdc_hits.size(); i++){std::cout<<"///["<<i<<"]///"<<std::endl; tdc_hits.at(i).Print();}
     std::cout<<"/////////////////////////qdc data//////////////////"<<std::endl;
@@ -56,8 +56,8 @@ public:
     bs & triggers_info;
     bs & mpmt_hits;
     bs & mpmt_waveforms;
-    bs & hk_mpmt_hits;
-    bs & hk_mpmt_pps;
+    bs & hkmpmt_hits;
+    bs & hkmpmt_pps;
     bs & tdc_hits;
     bs & qdc_hits;
 

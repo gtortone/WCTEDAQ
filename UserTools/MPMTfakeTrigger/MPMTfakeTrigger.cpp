@@ -92,6 +92,8 @@ void MPMTfakeTrigger::Thread(Thread_args* arg){
     ReadoutWindow* tmp=new ReadoutWindow;
     tmp->mpmt_hits=it->second->mpmt_hits;
     tmp->mpmt_waveforms=it->second->mpmt_waveforms;
+    tmp->hkmpmt_hits=it->second->hkmpmt_hits;
+    tmp->hkmpmt_pps=it->second->hkmpmt_pps;
     TriggerInfo tmp_trigger;
     tmp_trigger.type=TriggerType::NONE;
     tmp_trigger.time=it->first;

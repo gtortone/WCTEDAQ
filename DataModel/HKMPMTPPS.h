@@ -20,6 +20,10 @@ public:
       card_id=in_card_id; 
       memcpy(&data[0], in_data, sizeof(data));
    }
+   
+   uint8_t* GetData() {
+      return data;
+   }
 
    static unsigned int GetSize() { 
       return sizeof(data);
@@ -75,6 +79,22 @@ public:
       card_id = in;
    }
 
+   bool VerifyCRC(uint8_t *val = nullptr) {
+      uint8_t crc = 0;
+
+      for(int i=0; i<sizeof(data)-1; i++)
+         crc ^= data[i];
+
+      // get last 4 bits in CRC
+      crc ^= ((data[sizeof(data)-1]& 0b11110000) >> 4);
+      crc = ((crc & 0b11110000) >> 4) ^ (crc & 0b00001111);
+
+      if(val != nullptr)
+         *val = crc;
+
+      return (crc == GetCRC());
+   }
+
    bool Print() {
 
       printf(" header = %d\n", unsigned(GetHeader()));
@@ -87,6 +107,13 @@ public:
       printf(" crc = %d\n", unsigned(GetCRC()));
       printf(" dead_time = %d\n", GetDeadTime());
 
+      return true;
+   }
+
+   bool Dump() {
+      for(int i=0; i<sizeof(data); i++)
+         printf("0x%X ", data[i]);
+      printf("\n");
       return true;
    }
 

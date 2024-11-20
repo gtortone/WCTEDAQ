@@ -77,10 +77,8 @@ public:
 
    bool Dump() {
       printf("header: ");
-      uint16_t *bufusint;
-      bufusint = reinterpret_cast<uint16_t *>(data);
-      for(int i=0; i<sizeof(data)/2; i++)
-         printf("0x%X ", bufusint[i]);
+      for(int i=0; i<sizeof(data); i++)
+         printf("0x%X ", data[i]);
       printf("\n");
       return true;
    }
@@ -130,10 +128,8 @@ public:
 
    bool Dump() {
       printf("subhit: ");
-      uint16_t *bufusint;
-      bufusint = reinterpret_cast<uint16_t *>(data);
-      for(int i=0; i<sizeof(data)/2; i++)
-         printf("0x%X ", bufusint[i]);
+      for(int i=0; i<sizeof(data); i++)
+         printf("0x%X ", data[i]);
       printf("\n");
       return true;
    }
@@ -174,10 +170,8 @@ public:
 
    bool Dump() {
       printf("footer: ");
-      uint16_t *bufusint;
-      bufusint = reinterpret_cast<uint16_t *>(data);
-      for(int i=0; i<sizeof(data)/2; i++)
-         printf("0x%X ", bufusint[i]);
+      for(int i=0; i<sizeof(data); i++)
+         printf("0x%X ", data[i]);
       printf("\n");
       return true;
    }
@@ -239,12 +233,38 @@ public:
       return true;
    }
 
-   bool Dump() {
+   bool VerifyCRC(uint8_t *val = nullptr) {
+      uint8_t crc = 0;
+      uint8_t *data;
+
+      data = header.GetData();
+      for(int i=0; i<header.GetSize(); i++)
+         crc ^= data[i]; 
+
       for(int i=0; i<header.GetSubHitNum(); i++) {
-         header.Dump();
-         sub_hits[i].Dump();
-         footer.Dump();
+         data = sub_hits[i].GetData();
+         for(int k=0; k<sub_hits[i].GetSize(); k++)
+            crc ^= data[k];
       }
+      data = footer.GetData();
+      for(int i=0; i<footer.GetSize()-1; i++)
+         crc ^= data[i];
+
+      // get last 4 bits in CRC
+      crc ^= ((data[footer.GetSize()-1] & 0b11110000) >> 4);
+      crc = ((crc & 0b11110000) >> 4) ^ (crc & 0b00001111);
+
+      if(val != nullptr)
+         *val = crc;
+
+      return (crc == footer.GetCRC());
+   }
+
+   bool Dump() {
+      header.Dump();
+      for(int i=0; i<header.GetSubHitNum(); i++)
+         sub_hits[i].Dump();
+      footer.Dump();
       return true;
    }
 

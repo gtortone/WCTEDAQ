@@ -92,10 +92,12 @@ void FileWriter::Thread(Thread_args* arg){
   }
   
   std::stringstream filename;
-  filename<<(*args->file_name)<<"R"<<args->data->run_number<<"S"<<args->data->sub_run_number<<"P"<<(*args->part_number)<<".dat";
+  filename<<*(args->file_name)<<"R"<<args->data->run_number<<"S"<<args->data->sub_run_number<<"P"<<*(args->part_number)<<".dat";
   BinaryStream output;
   output.Bopen(filename.str().c_str(), NEW, UNCOMPRESSED);
-  
+
+  printf("part_number: %ld\n", *(args->part_number));
+
   WCTERawData tmp;
   
   tmp.readout_windows.resize(readout_windows->size());
@@ -112,7 +114,7 @@ void FileWriter::Thread(Thread_args* arg){
   
   
   output.Bclose();
-  *args->part_number++;
+  (*(args->part_number))++;
   
 }
 
