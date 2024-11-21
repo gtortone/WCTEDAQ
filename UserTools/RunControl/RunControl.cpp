@@ -83,7 +83,9 @@ bool RunControl::Execute(){
 	    if(m_lapse.is_negative() && !m_data->change_config){
               //printf("in runstart lapse\n");
 	      
-	      *m_start_time= boost::posix_time::microsec_clock::universal_time() +  boost::posix_time::minutes(1); ///now+1min
+         // as temporary workaround start run asap
+	      *m_start_time= boost::posix_time::microsec_clock::universal_time() +  boost::posix_time::seconds(5); ///now+5sec
+	      //*m_start_time= boost::posix_time::microsec_clock::universal_time() +  boost::posix_time::minutes(1); ///now+1min
 	      unsigned long secs_since_epoch= boost::posix_time::time_duration(*m_start_time -  boost::posix_time::time_from_string("1970-01-01 00:00:00.000")).total_seconds();
 	      
 	      std::string json_payload="{\"Timestamp\":" + std::to_string(secs_since_epoch) + "}";
