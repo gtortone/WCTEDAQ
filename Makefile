@@ -37,7 +37,7 @@ Libs=-L $(SOURCEDIR)/lib/ -lDataModel -L $(ToolDAQFramework)/lib/ -lToolDAQChain
 
 #.SECONDARY: $(%.o)
 
-all: $(DataModelHEADERS) $(MyToolHEADERS) $(SOURCEFILES) $(LIBRARIES) main readfile getconfig NodeDaemon RemoteControl
+all: $(DataModelHEADERS) $(MyToolHEADERS) $(SOURCEFILES) $(LIBRARIES) main readfile NodeDaemon RemoteControl #getconfig 
 
 debug: all
 
@@ -49,9 +49,9 @@ readfile: src/readfile.o $(LIBRARIES) $(DataModelHEADERS) $(MyToolHEADERS) | $(S
 	@echo -e "\e[38;5;11m\n*************** Making " $@ " ****************\e[0m"
 	g++  $(CXXFLAGS) $< -o $@ $(Includes) $(Libs) $(DataModelInclude) $(DataModelLib) $(MyToolsInclude) $(MyToolsLib) 
 
-getconfig: src/getconfig.o $(LIBRARIES) $(DataModelHEADERS) $(MyToolHEADERS) | $(SOURCEFILES)
-	@echo -e "\e[38;5;11m\n*************** Making " $@ " ****************\e[0m"
-	g++  $(CXXFLAGS) $< -o $@ $(Includes) $(Libs) $(DataModelInclude) $(DataModelLib) $(MyToolsInclude) $(MyToolsLib) 
+#getconfig: src/getconfig.o $(LIBRARIES) $(DataModelHEADERS) $(MyToolHEADERS) | $(SOURCEFILES)
+#	@echo -e "\e[38;5;11m\n*************** Making " $@ " ****************\e[0m"
+#	g++  $(CXXFLAGS) $< -o $@ $(Includes) $(Libs) $(DataModelInclude) $(DataModelLib) $(MyToolsInclude) $(MyToolsLib) 
 
 include/%.h:
 	@echo -e "\e[38;5;87m\n*************** sym linking headers ****************\e[0m"
