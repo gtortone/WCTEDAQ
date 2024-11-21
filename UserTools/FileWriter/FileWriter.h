@@ -21,7 +21,8 @@ struct FileWriter_args:Thread_args{
   FileWriter_args();
   ~FileWriter_args();
   DataModel* data;
-  std::string* file_name;
+  std::string* directory_name;
+  std::string* file_prefix;
   unsigned long* part_number;
   boost::posix_time::ptime last;
   boost::posix_time::time_duration period;
@@ -58,7 +59,8 @@ class FileWriter: public Tool {
   Utilities* m_util;  ///< Pointer to utilities class to help with threading
   FileWriter_args* args; ///< thread args (also holds pointer to the thread)
 
-  std::string m_file_name;
+  std::string m_file_prefix;
+  std::string m_directory_name;
   unsigned long m_part_number;
   unsigned int m_file_writeout_period;
 

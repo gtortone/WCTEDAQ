@@ -2,14 +2,16 @@
 
 FileWriter_args::FileWriter_args():Thread_args(){
   data=0;
-  file_name=0;
+  file_prefix=0;
+  directory_name=0;
   part_number=0;
   file_writeout_period=0;
 }
 
 FileWriter_args::~FileWriter_args(){
   data=0;
-  file_name=0;
+  file_prefix=0;
+  directory_name=0;
   part_number=0;
   file_writeout_period=0;
 }
@@ -30,7 +32,8 @@ bool FileWriter::Initialise(std::string configfile, DataModel &data){
   LoadConfig();
   
   args->data= m_data;
-  args->file_name= &m_file_name;
+  args->file_prefix= &m_file_prefix;
+  args->directory_name = &m_directory_name;
   args->part_number= &m_part_number;
   args->file_writeout_period= & m_file_writeout_period;
   
@@ -90,9 +93,24 @@ void FileWriter::Thread(Thread_args* arg){
     readout_windows=0;
     return;
   }
+
+  std::stringstream rundir;
+  rundir << "run" << std::setfill('0') << std::setw(3) << args->data->run_number;
+  
+  std::string dirstr;
+  dirstr = *(args->directory_name) + '/' + rundir.str();
+
+  if (access(dirstr.c_str(), F_OK) == -1)
+     mkdir(dirstr.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   
   std::stringstream filename;
-  filename<<*(args->file_name)<<"R"<<args->data->run_number<<"S"<<args->data->sub_run_number<<"P"<<*(args->part_number)<<".dat";
+  filename << dirstr << 
+      "/" << *(args->file_prefix) << 
+      "R" << std::setfill('0') << std::setw(3) << args->data->run_number << 
+      "S" << std::setfill('0') << std::setw(2) << args->data->sub_run_number <<
+      "P" << std::setfill('0') << std::setw(2) << *(args->part_number) <<
+      ".dat";
+
   BinaryStream output;
   output.Bopen(filename.str().c_str(), NEW, UNCOMPRESSED);
 
@@ -122,7 +140,8 @@ void FileWriter::LoadConfig(){ // change to bool have a return type
 
   
   if(!m_variables.Get("verbose",m_verbose)) m_verbose=1;
-  if(!m_variables.Get("file_name",m_file_name)) m_file_name="./data";
+  if(!m_variables.Get("directory_name",m_directory_name)) m_directory_name=".";
+  if(!m_variables.Get("file_name",m_file_prefix)) m_file_prefix="data";
   if(!m_variables.Get("file_writeout_period",m_file_writeout_period)) m_file_writeout_period=300;
   
   m_part_number=0;
