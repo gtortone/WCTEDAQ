@@ -12,8 +12,8 @@ ifeq ($(MAKECMDGOALS),debug)
 CXXFLAGS+= -O0 -g -lSegFault -rdynamic -DDEBUG
 endif
 
-DataModelInclude = -I $(Dependencies)/caen/include
-DataModelLib = -L $(Dependencies)/caen/lib -lcaen++ -lCAENComm -lCAENVME
+#DataModelInclude = -I $(Dependencies)/caen/include
+#DataModelLib = -L $(Dependencies)/caen/lib -lcaen++ -lCAENComm -lCAENVME
 
 MyToolsInclude =
 MyToolsLib =
@@ -43,15 +43,15 @@ debug: all
 
 main: src/main.o $(LIBRARIES) $(DataModelHEADERS) $(MyToolHEADERS) | $(SOURCEFILES)
 	@echo -e "\e[38;5;11m\n*************** Making " $@ " ****************\e[0m"
-	g++  $(CXXFLAGS) $< -o $@ $(Includes) $(Libs) $(DataModelInclude) $(DataModelLib) $(MyToolsInclude) $(MyToolsLib) 
+	g++  $(CXXFLAGS) $< -o $@ $(Includes) $(Libs) $(MyToolsInclude) $(MyToolsLib) 
 
 readfile: src/readfile.o $(LIBRARIES) $(DataModelHEADERS) $(MyToolHEADERS) | $(SOURCEFILES)
 	@echo -e "\e[38;5;11m\n*************** Making " $@ " ****************\e[0m"
-	g++  $(CXXFLAGS) $< -o $@ $(Includes) $(Libs) $(DataModelInclude) $(DataModelLib) $(MyToolsInclude) $(MyToolsLib) 
+	g++  $(CXXFLAGS) $< -o $@ $(Includes) $(Libs) $(MyToolsInclude) $(MyToolsLib) 
 
 #getconfig: src/getconfig.o $(LIBRARIES) $(DataModelHEADERS) $(MyToolHEADERS) | $(SOURCEFILES)
 #	@echo -e "\e[38;5;11m\n*************** Making " $@ " ****************\e[0m"
-#	g++  $(CXXFLAGS) $< -o $@ $(Includes) $(Libs) $(DataModelInclude) $(DataModelLib) $(MyToolsInclude) $(MyToolsLib) 
+#	g++  $(CXXFLAGS) $< -o $@ $(Includes) $(Libs) $(MyToolsInclude) $(MyToolsLib) 
 
 include/%.h:
 	@echo -e "\e[38;5;87m\n*************** sym linking headers ****************\e[0m"
@@ -59,27 +59,27 @@ include/%.h:
 
 src/%.o :  src/%.cpp   
 	@echo -e "\e[38;5;214m\n*************** Making " $@ "****************\e[0m"
-	g++ $(CXXFLAGS) -c $< -o $@ $(Includes) $(DataModelInclude)
+	g++ $(CXXFLAGS) -c $< -o $@ $(Includes) 
 
 UserTools/Factory/Factory.o :  UserTools/Factory/Factory.cpp  $(DataModelHEADERS) $(MyToolHEADERS)
 	@echo -e "\e[38;5;214m\n*************** Making " $@ "****************\e[0m"
-	g++ $(CXXFLAGS) -c $< -o $@ $(Includes) $(DataModelInclude) $(ToolsInclude)
+	g++ $(CXXFLAGS) -c $< -o $@ $(Includes) $(ToolsInclude)
 
 UserTools/%.o :  UserTools/%.cpp  $(DataModelHEADERS) UserTools/%.h
 	@echo -e "\e[38;5;214m\n*************** Making " $@ "****************\e[0m"
-	g++ $(CXXFLAGS) -c $< -o $@ $(Includes) $(DataModelInclude) $(ToolsInclude)
+	g++ $(CXXFLAGS) -c $< -o $@ $(Includes) $(ToolsInclude)
 
 DataModel/%.o : DataModel/%.cpp DataModel/%.h  $(DataModelHEADERS)
 	@echo -e "\e[38;5;214m\n*************** Making " $@ "****************\e[0m"
-	g++ $(CXXFLAGS) -c $< -o $@ $(Includes) $(DataModelInclude)
+	g++ $(CXXFLAGS) -c $< -o $@ $(Includes)
 
 lib/libDataModel.so: $(patsubst %.cpp, %.o , $(wildcard DataModel/*.cpp)) |   $(DataModelHEADERS)
 	@echo -e "\e[38;5;201m\n*************** Making " $@ "****************\e[0m"
-	g++ $(CXXFLAGS) --shared $^ -o $@ $(Includes) $(DataModelInclude)
+	g++ $(CXXFLAGS) --shared $^ -o $@ $(Includes)
 
 lib/libMyTools.so: $(patsubst %.cpp, %.o , $(filter-out $(AlreadyCompiled), $(wildcard UserTools/*/*.cpp))) |   $(DataModelHEADERS) $(MyToolHEADERS)
 	@echo -e "\e[38;5;201m\n*************** Making " $@ "****************\e[0m"
-	g++ $(CXXFLAGS) --shared $^ -o $@ $(Includes) $(DataModelInclude) $(MyToolsInclude)
+	g++ $(CXXFLAGS) --shared $^ -o $@ $(Includes) $(MyToolsInclude)
 
 lib/%.so:
 	@echo -e "\e[38;5;87m\n*************** sym linking Tool libs ****************\e[0m"
