@@ -77,15 +77,20 @@ void MPMTfakeTrigger::Thread(Thread_args* arg){
   args->data->unsorted_data_mtx.lock();
   for(std::map<unsigned int,MPMTData*>::iterator it=args->data->unsorted_data.begin(); it!=args->data->unsorted_data.end(); it++){
     
-    if(it->first <= args->data->current_coarse_counter - 125000000U){
+    printf("it->first: %ld, args->data->current_coarse_counter - 20: %ld\n",
+      (it->first), args->data->current_coarse_counter - 20);
+
+    if( it->first <= (args->data->current_coarse_counter - 20)) {
       m_unsorted_data[it->first]=it->second;
       it->second=0;
     }
   }
   
   for(std::map<unsigned int,MPMTData*>::iterator it=m_unsorted_data.begin(); it!=m_unsorted_data.end(); it++){
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> MPMTFakeTrigger: erase\n");
     args->data->unsorted_data.erase(it->first);
   }
+  printf(">> erase finished\n");
   args->data->unsorted_data_mtx.unlock();
   
   for(std::map<unsigned int,MPMTData*>::iterator it=m_unsorted_data.begin(); it!=m_unsorted_data.end(); it++){

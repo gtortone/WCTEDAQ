@@ -68,34 +68,7 @@ bool MPMT::Initialise(std::string configfile, DataModel &data){
 
 
 bool MPMT::Execute(){
-  /*
-  for(unsigned int i=0; i<args.size(); i++){
-    if(args.at(i)->busy==0){
-      *m_log<<"reply="<<args.at(i)->message<<std::endl;
-      args.at(i)->message="Hi";
-      args.at(i)->busy=1;
-      break;
-    }
 
-  }
-
-  m_freethreads=0;
-  unsigned int lastfree=0;
-  for(unsigned int i=0; i<args.size(); i++){
-    if(args.at(i)->busy==0){
-      m_freethreads++;
-      lastfree=i; 
-    }
-  }
-
-  if(m_freethreads<1) CreateThread();
-  if(m_freethreads>1) DeleteThread(lastfree);
-  
-  *m_log<<ML(1)<<"free threads="<<m_freethreads<<":"<<args.size()<<std::endl;
-  MLC();
-  
-  // sleep(1);  for single tool testing
-  */
   return true;
 }
 
@@ -165,6 +138,7 @@ void MPMT::Thread(Thread_args* arg){
   
   if( args->lapse.is_negative()){
     unsigned short num_connections = args->connections.size();
+    printf("UpdateConnections...(num_connections: %d)\n", num_connections);
     if(args->utils->UpdateConnections("MPMT", args->data_sock, args->connections, args->data_port) > num_connections) args->m_data->services->SendLog("Info: New MPMT connected",4); //add pmt id
     args->m_data->monitoring_store.Set("connected_MPMTs",num_connections);
     args->last= boost::posix_time::microsec_clock::universal_time();
@@ -260,7 +234,8 @@ bool MPMT::ProcessData(void* data){
   MPMTMessages* msgs=reinterpret_cast<MPMTMessages*>(data);
   
   DAQHeader* daq_header=reinterpret_cast<DAQHeader*>(msgs->daq_header->data());
-  unsigned int bin= daq_header->GetCoarseCounter() >> 6; //might not be worth rounding
+  //unsigned int bin= daq_header->GetCoarseCounter() >> 6; //might not be worth rounding
+  unsigned int bin= daq_header->GetCoarseCounter(); // time elapsed since start of run in seconds
   unsigned short card_id = daq_header->GetCardID();
   unsigned short card_type = daq_header->GetCardType();
   unsigned long bytes=msgs->mpmt_data->size();
@@ -293,8 +268,6 @@ bool MPMT::ProcessData(void* data){
          current_byte += 4;
       }
       
-      //printf("aligned!\n");
-
       if(((mpmt_data[current_byte] & 0b00111100) >> 2) == 0U) { // MPMT Hit event
         HKMPMTHit tmp(card_id, &mpmt_data[current_byte]);
         current_byte += tmp.GetSize();
@@ -394,7 +367,8 @@ bool MPMT::ProcessData(void* data){
   msgs->m_data->unsorted_data_mtx.lock();
   if(msgs->m_data->unsorted_data.count(bin)==0){
     msgs->m_data->unsorted_data[bin]=new MPMTData();
-    msgs->m_data->unsorted_data[bin]->coarse_counter=bin<<6;
+    //msgs->m_data->unsorted_data[bin]->coarse_counter=bin<<6;
+    msgs->m_data->unsorted_data[bin]->coarse_counter=bin;
   }
   if(card_type<2U){ //WCTEMPMT and buffered ADC
     //printf("in send unsorted ADC\n");
@@ -414,6 +388,9 @@ bool MPMT::ProcessData(void* data){
 
   else if(card_type==2U) { // MPMT-FD card
     //printf("in send unsorted MPMT-FD card\n");
+    printf("msgs->m_data->unsorted_data[%ld]->hkmpmt_hits.size(): %d\n", bin, msgs->m_data->unsorted_data[bin]->hkmpmt_hits.size());
+    printf("msgs->m_data->unsorted_data[%ld]->coarse_counter: %ld\n", bin, msgs->m_data->unsorted_data[bin]->coarse_counter);
+    printf("msgs->m_data->current_coarse_counter: %ld\n", msgs->m_data->current_coarse_counter);
     msgs->m_data->unsorted_data[bin]->hkmpmt_hits.insert(msgs->m_data->unsorted_data[bin]->hkmpmt_hits.end(), vec_hkmpmt_hit.begin(), vec_hkmpmt_hit.end());
     msgs->m_data->unsorted_data[bin]->hkmpmt_pps.insert(msgs->m_data->unsorted_data[bin]->hkmpmt_pps.end(), vec_hkmpmt_pps.begin(), vec_hkmpmt_pps.end());
     //printf("unsorted MPMT-FD card sent\n");
@@ -425,10 +402,7 @@ bool MPMT::ProcessData(void* data){
   tmp<<"MPMT:"<<card_id;
   msgs->m_data->hitmap[tmp.str()]++;
   
-  //printf("delete data\n");
   delete msgs;
   msgs=0;
-  //printf("datadeleted all good\n");
   return true;
-  
 }

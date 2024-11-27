@@ -184,9 +184,10 @@ void RunControl::Thread(Thread_args* arg){
   
   RunControl_args* args=reinterpret_cast<RunControl_args*>(arg);
   
-  boost::posix_time::time_duration td = (boost::posix_time::microsec_clock::universal_time() - *(args->start_time));
+  boost::posix_time::time_duration td = (boost::posix_time::second_clock::universal_time() - *(args->start_time));
 
-  *(args->current_coarse_counter)=td.total_milliseconds()*125000;
+  //*(args->current_coarse_counter)=td.total_milliseconds()*125000;
+  *(args->current_coarse_counter)=td.total_seconds();
 
   usleep(1000);
   
