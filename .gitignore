@@ -8,3 +8,6 @@ Dependencies
 main
 *.d
 *.root
+NodeDaemon
+RemoteControl
+UUID

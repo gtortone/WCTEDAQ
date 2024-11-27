@@ -90,7 +90,6 @@ void MPMTfakeTrigger::Thread(Thread_args* arg){
     printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> MPMTFakeTrigger: erase\n");
     args->data->unsorted_data.erase(it->first);
   }
-  printf(">> erase finished\n");
   args->data->unsorted_data_mtx.unlock();
   
   for(std::map<unsigned int,MPMTData*>::iterator it=m_unsorted_data.begin(); it!=m_unsorted_data.end(); it++){
