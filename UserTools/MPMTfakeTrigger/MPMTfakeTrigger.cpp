@@ -77,10 +77,10 @@ void MPMTfakeTrigger::Thread(Thread_args* arg){
   args->data->unsorted_data_mtx.lock();
   for(std::map<unsigned int,MPMTData*>::iterator it=args->data->unsorted_data.begin(); it!=args->data->unsorted_data.end(); it++){
     
-    printf("it->first: %ld, args->data->current_coarse_counter - 20: %ld\n",
-      (it->first), args->data->current_coarse_counter - 20);
+    printf("it->first: %ld, args->data->current_coarse_counter - 2: %ld\n",
+      (it->first), args->data->current_coarse_counter - 2);
 
-    if( it->first <= (args->data->current_coarse_counter - 20)) {
+    if( it->first <= (args->data->current_coarse_counter - 2)) {
       m_unsorted_data[it->first]=it->second;
       it->second=0;
     }
@@ -94,15 +94,15 @@ void MPMTfakeTrigger::Thread(Thread_args* arg){
   
   for(std::map<unsigned int,MPMTData*>::iterator it=m_unsorted_data.begin(); it!=m_unsorted_data.end(); it++){
     ReadoutWindow* tmp=new ReadoutWindow;
-    tmp->mpmt_hits=it->second->mpmt_hits;
-    tmp->mpmt_waveforms=it->second->mpmt_waveforms;
+    //tmp->mpmt_hits=it->second->mpmt_hits;
+    //tmp->mpmt_waveforms=it->second->mpmt_waveforms;
     tmp->hkmpmt_hits=it->second->hkmpmt_hits;
     tmp->hkmpmt_pps=it->second->hkmpmt_pps;
-    TriggerInfo tmp_trigger;
-    tmp_trigger.type=TriggerType::NONE;
-    tmp_trigger.time=it->first;
-    tmp_trigger.mpmt_LEDs=it->second->mpmt_leds;
-    tmp->triggers_info.push_back(tmp_trigger);
+    //TriggerInfo tmp_trigger;
+    //tmp_trigger.type=TriggerType::NONE;
+    //tmp_trigger.time=it->first;
+    //tmp_trigger.mpmt_LEDs=it->second->mpmt_leds;
+    //tmp->triggers_info.push_back(tmp_trigger);
     args->data->readout_windows_mtx.lock();
     args->data->readout_windows->push_back(tmp);
     args->data->readout_windows_mtx.unlock();

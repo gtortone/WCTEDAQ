@@ -108,7 +108,7 @@ void FileWriter::Thread(Thread_args* arg){
       "/" << *(args->file_prefix) << 
       "R" << std::setfill('0') << std::setw(3) << args->data->run_number << 
       "S" << std::setfill('0') << std::setw(2) << args->data->sub_run_number <<
-      "P" << std::setfill('0') << std::setw(2) << *(args->part_number) <<
+      "P" << std::setfill('0') << std::setw(4) << *(args->part_number) <<
       ".dat";
 
   BinaryStream output;
@@ -130,14 +130,11 @@ void FileWriter::Thread(Thread_args* arg){
   delete readout_windows;
   readout_windows=0;
   
-  
   output.Bclose();
   (*(args->part_number))++;
-  
 }
 
 void FileWriter::LoadConfig(){ // change to bool have a return type
-
   
   if(!m_variables.Get("verbose",m_verbose)) m_verbose=1;
   if(!m_variables.Get("directory_name",m_directory_name)) m_directory_name=".";
@@ -147,5 +144,4 @@ void FileWriter::LoadConfig(){ // change to bool have a return type
   m_part_number=0;
   args->last=boost::posix_time::microsec_clock::universal_time();
   args->period=boost::posix_time::seconds(m_file_writeout_period);
-  
 }

@@ -13,16 +13,16 @@ class TriggerInfo;
 struct MPMTData{
 
   unsigned int coarse_counter;
-  std::vector<WCTEMPMTHit> mpmt_hits;
-  std::vector<WCTEMPMTLED> mpmt_leds;
-  std::vector<WCTEMPMTWaveform> mpmt_waveforms;
-  std::vector<WCTEMPMTPPS> mpmt_pps;
-  std::vector<WCTEMPMTHit> mpmt_triggers;
+  //std::vector<WCTEMPMTHit> mpmt_hits;
+  //std::vector<WCTEMPMTLED> mpmt_leds;
+  //std::vector<WCTEMPMTWaveform> mpmt_waveforms;
+  //std::vector<WCTEMPMTPPS> mpmt_pps;
+  //std::vector<WCTEMPMTHit> mpmt_triggers;
   std::vector<HKMPMTHit> hkmpmt_hits;
   std::vector<HKMPMTPPS> hkmpmt_pps;
-  unsigned int cumulative_sum[33554431U];
-  std::mutex unmerged_triggers_mtx;
-  std::vector<TriggerInfo> unmerged_triggers;
+  //unsigned int cumulative_sum[33554431U];
+  //std::mutex unmerged_triggers_mtx;
+  //std::vector<TriggerInfo> unmerged_triggers;
   
 
 };

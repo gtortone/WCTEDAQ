@@ -14,6 +14,9 @@ int main(int argc, char *argv[]) {
    input >> p;
 
    std::cout << "read file " << std::endl;
+   for(int w=0; w<p.readout_windows.size(); w++) {
+      printf("window %d: #hits %d  #PPS %d\n", w, p.readout_windows[w].hkmpmt_hits.size(), p.readout_windows[w].hkmpmt_pps.size());
+   }
 
    //std::cout << p.Print() << std::endl;
    

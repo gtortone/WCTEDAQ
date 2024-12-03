@@ -242,10 +242,6 @@ bool MPMT::ProcessData(void* data){
   unsigned long current_byte=0;
 
   //  daq_header->Print();
-  std::vector<WCTEMPMTHit> vec_mpmt_hit;
-  std::vector<WCTEMPMTLED> vec_mpmt_led;
-  std::vector<WCTEMPMTPPS> vec_mpmt_pps;
-  std::vector<WCTEMPMTWaveform> vec_mpmt_waveform;
   std::vector<HKMPMTHit> vec_hkmpmt_hit;
   std::vector<HKMPMTPPS> vec_hkmpmt_pps;
 
@@ -297,67 +293,8 @@ bool MPMT::ProcessData(void* data){
 
     printf("header misalignments: %d - footer misalignments: %d\n", header_misalign, footer_misalign);
   
-  } else {
+  } 
      
-    //printf("data size %d\n",msgs->mpmt_data->size());
-  
-    while(current_byte<bytes){
-      //printf("cuurent byte %d : %d\n",mpmt_data[current_byte], (mpmt_data[current_byte] >> 6));
-      //printf("(mpmt_data[current_byte] >> 6) == 0b1:%d\n", ((mpmt_data[current_byte] >> 6) == 0b1));
-      if((mpmt_data[current_byte] >> 6) == 0b1){ //its a hit or led or pps
-        //printf("in hit, led,pps \n");
-        if(((mpmt_data[current_byte] >> 2) & 0b00001111 ) == 0U && bytes-current_byte >= WCTEMPMTHit::GetSize()){ // its normal mpmt hit
-     //printf("in hit\n");
-     WCTEMPMTHit tmp(card_id, &mpmt_data[current_byte]);
-     current_byte+=WCTEMPMTHit::GetSize();
-     vec_mpmt_hit.push_back(tmp);
-        }
-        
-        //else if(((mpmt_data[current_byte] >> 2) & 0b00001111 ) == 1U ){
-     //printf("in ped \n");
-        //      }// its a pedistal (dont know) 
-        
-        else if(((mpmt_data[current_byte] >> 2) & 0b00001111 ) == 2U && bytes-current_byte >= WCTEMPMTLED::GetSize()){// its LED
-     //printf("in led \n");
-     WCTEMPMTLED tmp(card_id, &mpmt_data[current_byte]);
-     current_byte+=WCTEMPMTLED::GetSize();
-     vec_mpmt_led.push_back(tmp);
-        }
-        
-        //      else if(((mpmt_data[current_byte] >> 2) & 0b00001111 ) == 3U){
-     //printf("in calib \n");
-        //	}// its calib??
-        
-        else if(((mpmt_data[current_byte] >> 2) & 0b00001111 ) == 15U && bytes-current_byte >= WCTEMPMTPPS::GetSize() ){// its PPS
-     //printf("in pps\n");
-     WCTEMPMTPPS tmp(card_id, &mpmt_data[current_byte]);
-     current_byte+=WCTEMPMTPPS::GetSize();
-     vec_mpmt_pps.push_back(tmp);
-        }
-        else{
-      msgs->m_data->services->SendLog("ERROR: MPMT data is courupt or of uknown structure",0);
-     return false;
-
-        }
-      }
-      else if ((mpmt_data[current_byte] >> 6) == 2U && bytes-current_byte >= WCTEMPMTWaveformHeader::GetSize()){ //its a waveform
-        WCTEMPMTWaveform tmp(card_id, &mpmt_data[current_byte]);
-        current_byte+=  WCTEMPMTWaveformHeader::GetSize();
-        if(bytes-current_byte >= tmp.header.GetLength()){
-     tmp.samples.resize(tmp.header.GetLength());
-     memcpy(tmp.samples.data(), &mpmt_data[current_byte], tmp.header.GetLength());
-     current_byte+=(tmp.header.GetLength());
-     vec_mpmt_waveform.push_back(tmp);
-        }
-      }
-      else{
-         msgs->m_data->services->SendLog("ERROR: MPMT data is courupt or of uknown structure",0);      
-        return false;
-        
-      }
-    }  
-  } // end else
-    
   //printf("data processed \n");
  
   /////////////////////////////////////////////////
@@ -370,23 +307,8 @@ bool MPMT::ProcessData(void* data){
     //msgs->m_data->unsorted_data[bin]->coarse_counter=bin<<6;
     msgs->m_data->unsorted_data[bin]->coarse_counter=bin;
   }
-  if(card_type<2U){ //WCTEMPMT and buffered ADC
-    //printf("in send unsorted ADC\n");
-    msgs->m_data->unsorted_data[bin]->mpmt_hits.insert( msgs->m_data->unsorted_data[bin]->mpmt_hits.end(), vec_mpmt_hit.begin(), vec_mpmt_hit.end());
-    msgs->m_data->unsorted_data[bin]->mpmt_leds.insert( msgs->m_data->unsorted_data[bin]->mpmt_leds.end(), vec_mpmt_led.begin(), vec_mpmt_led.end());
-    msgs->m_data->unsorted_data[bin]->mpmt_pps.insert( msgs->m_data->unsorted_data[bin]->mpmt_pps.end(), vec_mpmt_pps.begin(), vec_mpmt_pps.end());
-    msgs->m_data->unsorted_data[bin]->mpmt_waveforms.insert( msgs->m_data->unsorted_data[bin]->mpmt_waveforms.end(), vec_mpmt_waveform.begin(), vec_mpmt_waveform.end());
-   //printf("unsorted ADC sent\n");
-  }
-  
-  else if(card_type==3U){ //trigger card
- //printf("in send unsorted triggercard\n");
-    msgs->m_data->unsorted_data[bin]->mpmt_triggers.insert( msgs->m_data->unsorted_data[bin]->mpmt_triggers.end(), vec_mpmt_hit.begin(), vec_mpmt_hit.end());
-    msgs->m_data->unsorted_data[bin]->mpmt_pps.insert( msgs->m_data->unsorted_data[bin]->mpmt_pps.end(), vec_mpmt_pps.begin(), vec_mpmt_pps.end());
-    //printf("unsorted triggercard sent\n");
-  }
 
-  else if(card_type==2U) { // MPMT-FD card
+  if(card_type==2U) { // MPMT-FD card
     //printf("in send unsorted MPMT-FD card\n");
     printf("msgs->m_data->unsorted_data[%ld]->hkmpmt_hits.size(): %d\n", bin, msgs->m_data->unsorted_data[bin]->hkmpmt_hits.size());
     printf("msgs->m_data->unsorted_data[%ld]->coarse_counter: %ld\n", bin, msgs->m_data->unsorted_data[bin]->coarse_counter);
